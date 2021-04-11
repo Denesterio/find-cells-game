@@ -1,0 +1,61 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #eee;
+}
+
+#for_table {
+  margin: 50px auto;
+  width: 700px;
+}
+
+table {
+  background-color: whitesmoke;
+  border-left: 1px solid darkgreen;
+  border-top: 1px solid darkgreen;
+  margin-top: 10px;
+}
+
+td {
+  width: 60px;
+  height: 40px;
+  margin-top: 25px;
+  line-height: 25px;
+  text-align: center;
+  border-bottom: 1px solid darkgreen;
+  border-right: 1px solid darkgreen;
+}
+
+.active {
+  background-color: greenyellow;
+}
+
+.not_founded {
+  background-color: darkred;
+}
+
+#button {
+  position: absolute;
+  margin: 0px auto;
+  left: 50%;
+  color: darkgreen;
+  background-color: #fff;
+  font-weight: 700;
+  font-size: 100%;
+  border-radius: 20px;
+  box-shadow: 2px -1px #aaa;
+  padding: 7px;
+}
+
+#button:active {
+  background-color: darkgreen;
+  color: #fff;
+}
+
+#button:active,
+#button:focus {
+  outline: none !important;
+}
+#button::-moz-focus-inner {
+  border: 0 !important;
+}
