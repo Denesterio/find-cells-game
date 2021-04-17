@@ -1,91 +1,117 @@
 'use strict';
 
-const button = document.querySelector('#button');
-const divForTable = document.getElementById('for_table');
-
-function tableGenerator(rows, cols) {
+const generateTable = (rows, cols) => {
   const table = document.createElement('table');
   for (let i = 1; i <= rows; i++) {
-    let tr = document.createElement('tr');
+    const tr = document.createElement('tr');
 
     for (let j = 1; j <= cols; ++j) {
-      let td = document.createElement('td');
+      const td = document.createElement('td');
       tr.appendChild(td);
     }
     table.appendChild(tr);
   }
   return table;
-}
+};
 
-const tableForGame = tableGenerator(10, 10);
+// Создание и привязывание таблицы
+const button = document.querySelector('#button');
+const divForTable = document.getElementById('for_table');
+const tableForGame = generateTable(10, 10);
 divForTable.append(tableForGame);
 
-let tds = tableForGame.querySelectorAll('td');
-tds = Array.from(tds);
-
-function getRandom(min, max) {
-  // получение случайного числа в диапазоне
+// Функции для подготовки игрового поля
+const getRandomNumberInRange = (min, max) => {
   return min + Math.floor(Math.random() * (max - min + 1));
-}
+};
 
-button.addEventListener('click', function bigGame() {
-  for (let cell of tds) {
+const clearCells = (cells) => {
+  for (const cell of cells) {
     cell.classList.remove('active');
-    cell.removeAttribute('data-active');
+    cell.removeAttribute('data-riddled');
     cell.classList.remove('not_founded');
   }
+};
 
-  let counter = 0;
+const riddleAndPutCells = (cells, countOfRiddled, arrToPutTo) => {
   const setForRandomNums = new Set();
 
   do {
-    let num = getRandom(0, 99);
+    let num = getRandomNumberInRange(0, 99);
     setForRandomNums.add(num);
-  } while (setForRandomNums.size < 10);
+  } while (setForRandomNums.size < countOfRiddled);
 
-  const arrForRandomNums = Array.from(setForRandomNums);
-  for (let i = 0; i < 10; ++i) {
-    tds[arrForRandomNums[i]].setAttribute('data-active', 'active');
+  const arrForRandomNums = [...setForRandomNums];
+  for (let i = 0; i < countOfRiddled; ++i) {
+    cells[arrForRandomNums[i]].setAttribute('data-riddled', 'active');
+    arrToPutTo.push(cells[arrForRandomNums[i]]);
   }
+};
 
-  function game(event) {
-    const target = event.target;
-    if (target.dataset.active) {
-      target.classList.add('active');
-      counter += 1;
-    } else {
-      for (let cell of tds) {
-        if (cell.classList.contains('active')) {
-          cell.classList.remove('active');
-          counter = 0;
-        }
+// Начало игры
+button.addEventListener('click', function startGame() {
+  // Подготовка игрового поля
+  const cells = [...tableForGame.querySelectorAll('td')];
+  const countOfRiddledCells = 10;
+  const riddledCells = [];
+  clearCells(cells);
+  riddleAndPutCells(cells, countOfRiddledCells, riddledCells);
+
+  // Вспомогательные функции для ведения игры
+  const isCellRiddled = (cell) => cell.hasAttribute('data-riddled');
+  const makeCellactive = (cell) => {
+    cell.classList.add('active');
+  };
+  const makeCellInactive = (cell) => {
+    cell.classList.remove('active');
+  };
+  const isCellNotFound = (cell) =>
+    cell.hasAttribute('data-riddled') && !cell.classList.contains('active');
+
+  // Функция для создания и ведения игры
+  const createGame = (countOfRiddled) => {
+    let counter = 0;
+    let activeCells = [];
+    const isWin = () => counter === countOfRiddled;
+
+    const keepActiveCells = (event) => {
+      const targetCell = event.target;
+
+      if (isCellRiddled(targetCell)) {
+        makeCellactive(targetCell);
+        counter += 1;
+        activeCells.push(targetCell);
+      } else {
+        activeCells.forEach((cell) => makeCellInactive(cell));
+        activeCells = [];
+        counter = 0;
       }
-    }
-    if (counter === 10) {
-      setTimeout(function () {
-        alert('Yeeehooo!!! You win! It was not easy, really?');
-      }, 100);
-      clearTimeout(timer);
-      tableForGame.removeEventListener('click', game);
-      button.addEventListener('click', bigGame);
-    }
-  }
+      if (isWin()) {
+        setTimeout(function () {
+          alert('Yeeehooo!!! You win! It was not easy, really?');
+        }, 100);
+        clearTimeout(timer);
+        tableForGame.removeEventListener('click', keepGame);
+        button.addEventListener('click', startGame);
+      }
+    };
 
-  tableForGame.addEventListener('click', game);
+    return keepActiveCells;
+  };
 
   const timer = setTimeout(() => {
     alert('You are lost:( Play again?');
-    for (let cell of tds) {
-      if (
-        cell.hasAttribute('data-active') &&
-        !cell.classList.contains('active')
-      ) {
+    for (const cell of riddledCells) {
+      if (isCellNotFound(cell)) {
         cell.classList.add('not_founded');
       }
     }
-    tableForGame.removeEventListener('click', game);
-    button.addEventListener('click', bigGame);
-  }, 300000);
+    tableForGame.removeEventListener('click', keepGame);
+    button.addEventListener('click', startGame);
+  }, 180000);
 
-  button.removeEventListener('click', bigGame);
+  //Создаем игру
+  const keepGame = createGame(countOfRiddledCells);
+  tableForGame.addEventListener('click', keepGame);
+  button.removeEventListener('click', startGame);
 });

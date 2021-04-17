@@ -27,7 +27,7 @@ td {
 }
 
 .active {
-  background-color: greenyellow;
+  background-color: darkgreen;
 }
 
 .not_founded {
@@ -37,13 +37,13 @@ td {
 #button {
   position: absolute;
   margin: 0px auto;
-  left: 50%;
+  left: 55%;
   color: darkgreen;
   background-color: #fff;
   font-weight: 700;
   font-size: 100%;
+  border: 2px solid darkgreen;
   border-radius: 20px;
-  box-shadow: 2px -1px #aaa;
   padding: 7px;
 }
 
@@ -58,4 +58,7 @@ td {
 }
 #button::-moz-focus-inner {
   border: 0 !important;
+}
+#button:hover {
+  cursor: pointer;
 }
