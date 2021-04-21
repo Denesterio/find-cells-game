@@ -14,25 +14,49 @@ const generateTable = (rows, cols) => {
   return table;
 };
 
-// Создание и привязывание таблицы
-const button = document.querySelector('#button');
-const divForTable = document.getElementById('for_table');
-const tableForGame = generateTable(10, 10);
-divForTable.append(tableForGame);
+// Вспомогательные функции для ведения игры
+// Проверка, загадана ли ячейка
+const isCellRiddled = (elem) => elem.hasAttribute('data-riddled');
+// Показать загаданную ячейку
+const makeElemActive = (elem) => {
+  elem.classList.add('active');
+};
+// Скрыть
+const makeElemInactive = (elem) => {
+  elem.classList.remove('active');
+};
+// Ячейка загадана, но не открыта?
+const isElemNotFound = (elem) =>
+  elem.hasAttribute('data-riddled') && !elem.classList.contains('active');
+// Показать ненайденную ячейку; также используется для окрашивания таймера, когда времени мало
+const paintElemInRed = (elem) => {
+  elem.classList.add('not_founded');
+};
+// Скрыть ненайденную ячейку; также используется для стандартного окрашивания таймера
+const removeRedBackground = (elem) => {
+  elem.classList.remove('not_founded');
+};
+// Снять выбор с загаданных ячеек
+const clearRiddles = (elem) => {
+  elem.removeAttribute('data-riddled');
+};
 
 // Функции для подготовки игрового поля
 const getRandomNumberInRange = (min, max) => {
   return min + Math.floor(Math.random() * (max - min + 1));
 };
 
-const clearCells = (cells) => {
-  for (const cell of cells) {
-    cell.classList.remove('active');
-    cell.removeAttribute('data-riddled');
-    cell.classList.remove('not_founded');
-  }
+// Снимает ненужные атрибуты и классы перед началом новой игры
+const clearCells = (arrWithRiddledCells) => {
+  arrWithRiddledCells.forEach((cell) => {
+    makeElemInactive(cell);
+    clearRiddles(cell);
+    removeRedBackground(cell);
+  });
 };
 
+// Функция для выбора "загаданных" ячеек
+// Принимает массив ячеек, число, сколько нужно выбрать, массив, куда отложить отмеченные
 const riddleAndPutCells = (cells, countOfRiddled, arrToPutTo) => {
   const setForRandomNums = new Set();
 
@@ -43,54 +67,47 @@ const riddleAndPutCells = (cells, countOfRiddled, arrToPutTo) => {
 
   const arrForRandomNums = [...setForRandomNums];
   for (let i = 0; i < countOfRiddled; ++i) {
-    cells[arrForRandomNums[i]].setAttribute('data-riddled', 'active');
+    cells[arrForRandomNums[i]].setAttribute('data-riddled', 'riddled');
     arrToPutTo.push(cells[arrForRandomNums[i]]);
   }
 };
+
+// Создание и привязывание таблицы
+const button = document.querySelector('#button');
+const divForTable = document.getElementById('for_table');
+const tableForGame = generateTable(10, 10);
+divForTable.append(tableForGame);
+const divForTimer = document.querySelector('.timer');
+const riddledCells = []; // Для ячеек, которые "загадал" компьютер
 
 // Начало игры
 button.addEventListener('click', function startGame() {
   // Подготовка игрового поля
   const cells = [...tableForGame.querySelectorAll('td')];
   const countOfRiddledCells = 10;
-  const riddledCells = [];
-  clearCells(cells);
+  clearCells(riddledCells);
   riddleAndPutCells(cells, countOfRiddledCells, riddledCells);
-
-  // Вспомогательные функции для ведения игры
-  const isCellRiddled = (cell) => cell.hasAttribute('data-riddled');
-  const makeCellactive = (cell) => {
-    cell.classList.add('active');
-  };
-  const makeCellInactive = (cell) => {
-    cell.classList.remove('active');
-  };
-  const isCellNotFound = (cell) =>
-    cell.hasAttribute('data-riddled') && !cell.classList.contains('active');
 
   // Функция для создания и ведения игры
   const createGame = (countOfRiddled) => {
-    let counter = 0;
     let activeCells = [];
-    const isWin = () => counter === countOfRiddled;
+    const isWin = () => activeCells.length === countOfRiddled;
 
     const keepActiveCells = (event) => {
       const targetCell = event.target;
 
       if (isCellRiddled(targetCell)) {
-        makeCellactive(targetCell);
-        counter += 1;
+        makeElemActive(targetCell);
         activeCells.push(targetCell);
-      } else {
-        activeCells.forEach((cell) => makeCellInactive(cell));
+      } else if (activeCells.length > 0) {
+        activeCells.forEach((cell) => makeElemInactive(cell));
         activeCells = [];
-        counter = 0;
       }
       if (isWin()) {
         setTimeout(function () {
           alert('Yeeehooo!!! You win! It was not easy, really?');
-        }, 100);
-        clearTimeout(timer);
+        }, 50);
+        clearInterval(countdown);
         tableForGame.removeEventListener('click', keepGame);
         button.addEventListener('click', startGame);
       }
@@ -99,16 +116,39 @@ button.addEventListener('click', function startGame() {
     return keepActiveCells;
   };
 
-  const timer = setTimeout(() => {
-    alert('You are lost:( Play again?');
-    for (const cell of riddledCells) {
-      if (isCellNotFound(cell)) {
-        cell.classList.add('not_founded');
-      }
+  // Установка таймера
+  let timeInSeconds = 180;
+  const timerToString = (timeInSeconds) => {
+    let minutes, seconds, text;
+    minutes = String(Math.floor(timeInSeconds / 60));
+    seconds = String(timeInSeconds % 60);
+    text = `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+    return text;
+  };
+
+  divForTimer.textContent = timerToString(timeInSeconds);
+  removeRedBackground(divForTimer);
+  makeElemActive(divForTimer);
+
+  const startCountdown = (div) => {
+    timeInSeconds -= 1;
+    div.textContent = timerToString(timeInSeconds);
+    if (timeInSeconds <= 30) {
+      paintElemInRed(div);
     }
-    tableForGame.removeEventListener('click', keepGame);
-    button.addEventListener('click', startGame);
-  }, 180000);
+    if (timeInSeconds === 0) {
+      clearInterval(countdown);
+      setTimeout(() => alert('You are lost:( Play again?'));
+      riddledCells
+        .filter((cell) => isElemNotFound(cell))
+        .forEach((cell) => paintElemInRed(cell));
+
+      tableForGame.removeEventListener('click', keepGame);
+      button.addEventListener('click', startGame);
+    }
+  };
+
+  const countdown = setInterval(startCountdown, 1000, divForTimer);
 
   //Создаем игру
   const keepGame = createGame(countOfRiddledCells);

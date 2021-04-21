@@ -36,7 +36,6 @@ td {
 
 #button {
   position: absolute;
-  margin: 0px auto;
   left: 55%;
   color: darkgreen;
   background-color: #fff;
@@ -61,4 +60,14 @@ td {
 }
 #button:hover {
   cursor: pointer;
+}
+
+.timer {
+  position: absolute;
+  left: 50%;
+  color: #fff;
+  font-size: 120%;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 7px;
 }
