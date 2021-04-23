@@ -83,7 +83,7 @@ const riddledCells = []; // Для ячеек, которые "загадал" �
 // Начало игры
 button.addEventListener('click', function startGame() {
   // Подготовка игрового поля
-  const cells = [...tableForGame.querySelectorAll('td')];
+  const cells = tableForGame.querySelectorAll('td');
   const countOfRiddledCells = 10;
   clearCells(riddledCells);
   riddleAndPutCells(cells, countOfRiddledCells, riddledCells);
@@ -133,7 +133,7 @@ button.addEventListener('click', function startGame() {
   const startCountdown = (div) => {
     timeInSeconds -= 1;
     div.textContent = timerToString(timeInSeconds);
-    if (timeInSeconds <= 30) {
+    if (timeInSeconds === 30) {
       paintElemInRed(div);
     }
     if (timeInSeconds === 0) {
