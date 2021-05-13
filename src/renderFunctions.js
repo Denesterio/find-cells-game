@@ -1,13 +1,5 @@
 import { getElemsNotFound } from './checks.js';
-
-//Перевод секунд в форматированную строку для таймера
-const timerToString = (timeInSeconds) => {
-  let minutes, seconds, text;
-  minutes = String(Math.floor(timeInSeconds / 60));
-  seconds = String(timeInSeconds % 60);
-  text = `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
-  return text;
-};
+import texts from '../texts/texts.js';
 
 // Показать загаданную ячейку
 const makeElemActive = (elem) => elem.classList.add('active');
@@ -31,13 +23,12 @@ const clearCells = (cells) => {
   });
 };
 
-// Показать div с результатом по завершении игры
-const showResult = (state, parent, result) => {
-  const div = document.createElement('div');
-  div.textContent = state.texts[result];
-  div.classList.add('result');
-  parent.append(div);
-  parent.style.marginBottom = '20px';
+//Перевод секунд в форматированную строку для таймера
+const timerToString = (timeInSeconds) => {
+  let minutes, seconds;
+  minutes = String(Math.floor(timeInSeconds / 60));
+  seconds = String(timeInSeconds % 60);
+  return `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
 };
 
 const timerRender = (value, container) => {
@@ -49,13 +40,22 @@ const timerRender = (value, container) => {
   }
 };
 
+// Показать div с результатом по завершении игры
+const showResult = (parent, result) => {
+  const div = document.createElement('div');
+  div.textContent = texts[result];
+  div.classList.add('result');
+  parent.append(div);
+  parent.style.marginBottom = '20px';
+};
+
 const tableRender = (state, value, table) => {
   if (value === 'right') {
     state.table.active.forEach((elem) => makeElemActive(elem));
   } else if (value === 'wrong') {
     state.table.riddled.forEach((elem) => makeElemInactive(elem));
   } else {
-    showResult(state, table.parentElement, value);
+    showResult(table.parentElement, value);
     getElemsNotFound(state).forEach((elem) => paintElemInRed(elem));
   }
 };

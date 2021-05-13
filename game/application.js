@@ -32,6 +32,8 @@ export default () => {
           target[prop] = value;
           button.removeAttribute('disabled');
           return true;
+        default:
+          throw new Error('Unknown changes in state');
       }
     },
   });

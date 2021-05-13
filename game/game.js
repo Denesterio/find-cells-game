@@ -14,10 +14,6 @@ export default (mainState, table, divTimer) => {
       active: [],
     },
     timer: 180,
-    texts: {
-      win: 'Yeeehooo!!! You win!',
-      lost: 'You are lost:( Play again?',
-    },
     lastClick: 'right',
   };
 
