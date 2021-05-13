@@ -24,8 +24,8 @@ const removeRedBackground = (elem) => elem.classList.remove('not_founded');
 const paintElemInRed = (elem) => elem.classList.add('not_founded');
 
 // Снимает ненужные атрибуты и классы перед началом новой игры
-const clearCells = (state) => {
-  state.table.riddled.forEach((cell) => {
+const clearCells = (cells) => {
+  cells.forEach((cell) => {
     makeElemInactive(cell);
     removeRedBackground(cell);
   });
@@ -55,7 +55,7 @@ const tableRender = (state, value, table) => {
   } else if (value === 'wrong') {
     state.table.riddled.forEach((elem) => makeElemInactive(elem));
   } else {
-    showResult(state, table.parentElement, state.status);
+    showResult(state, table.parentElement, value);
     getElemsNotFound(state).forEach((elem) => paintElemInRed(elem));
   }
 };

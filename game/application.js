@@ -1,4 +1,3 @@
-import { clearCells } from '../src/renderFunctions.js';
 import generateTable from '../src/generateTable.js';
 import startGame from './game.js';
 import { timerRender } from '../src/renderFunctions.js';
@@ -11,7 +10,6 @@ export default () => {
     table: {
       rows: 10,
       columns: 10,
-      riddled: [],
     },
     timer: 180,
   };
@@ -28,7 +26,6 @@ export default () => {
       switch (value) {
         case 'gameStarted':
           target[prop] = value;
-          clearCells(target);
           button.setAttribute('disabled', 'true');
           return true;
         case 'waiting':
@@ -43,7 +40,6 @@ export default () => {
 
   button.addEventListener('click', () => {
     stateWatcher.status = 'gameStarted';
-    state.table.riddled = [];
     startGame(stateWatcher, tableForGame, divForTimer);
   });
 };

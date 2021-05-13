@@ -5,7 +5,7 @@ const getRandomNumberInRange = (min, max) => {
 
 // Функция для выбора "загаданных" ячеек
 // Принимает массив ячеек таблицы, состояние
-export default (state, secondState, cells) => {
+export default (state, cells) => {
   const setForRandomNums = new Set();
 
   do {
@@ -16,6 +16,5 @@ export default (state, secondState, cells) => {
   const arrForRandomNums = [...setForRandomNums];
   arrForRandomNums.forEach((i) => {
     state.table.riddled.push(cells[i]);
-    secondState.table.riddled.push(cells[i]);
   });
 };

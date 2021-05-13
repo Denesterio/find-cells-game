@@ -15,14 +15,11 @@ export default (mainState, table, divTimer) => {
     },
     timer: 180,
     texts: {
-      win: 'Yeeehooo!!! You win! It was not easy, really?',
+      win: 'Yeeehooo!!! You win!',
       lost: 'You are lost:( Play again?',
     },
     lastClick: 'right',
   };
-
-  const cells = table.querySelectorAll('td');
-  riddleCells(state, mainState, cells);
 
   // Нужны при повторном запуске игры на том же поле
   const resultDiv = document.querySelector('.result');
@@ -30,9 +27,13 @@ export default (mainState, table, divTimer) => {
   table.parentElement.style.marginBottom = '50px';
   rf.timerRender(state.timer, divTimer);
 
+  const cells = table.querySelectorAll('td');
+  rf.clearCells(cells);
+  riddleCells(state, cells);
+
   const proxyState = new Proxy(state, {
     set(target, prop, value) {
-      if (typeof value === 'number') {
+      if (prop === 'timer' && typeof value === 'number') {
         target[prop] = value;
         rf.timerRender(value, divTimer);
         return true;
