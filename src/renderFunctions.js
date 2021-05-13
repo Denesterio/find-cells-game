@@ -40,22 +40,22 @@ const showResult = (state, parent, result) => {
   parent.style.marginBottom = '20px';
 };
 
-const timerRender = (state, container) => {
-  container.textContent = timerToString(state.timer.time);
-  if (state.timer.status === 'danger') {
+const timerRender = (value, container) => {
+  container.textContent = timerToString(value);
+  if (value <= 30) {
     paintElemInRed(container);
   } else {
     makeElemActive(container);
   }
 };
 
-const tableRender = (state, table, button) => {
-  if (state.status === 'game') {
-    state.table.riddled.forEach((elem) => makeElemInactive(elem));
+const tableRender = (state, value, table) => {
+  if (value === 'right') {
     state.table.active.forEach((elem) => makeElemActive(elem));
+  } else if (value === 'wrong') {
+    state.table.riddled.forEach((elem) => makeElemInactive(elem));
   } else {
     showResult(state, table.parentElement, state.status);
-    button.removeAttribute('disabled');
     getElemsNotFound(state).forEach((elem) => paintElemInRed(elem));
   }
 };

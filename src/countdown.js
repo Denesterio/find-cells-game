@@ -1,12 +1,9 @@
-export default (state, timerId, render, table, button) => {
-  state.timer.time -= 1;
-  if (state.timer.time <= 30) {
-    state.timer.status = 'danger';
-  }
-  if (state.timer.time === 0) {
+export default (state, mainState, timerId, gHandler, table) => {
+  state.timer = state.timer - 1;
+  if (state.timer === 0) {
     clearInterval(timerId);
     state.status = 'lost';
-    state.timer.status = 'expired';
-    render.call(this, state, table, button);
+    mainState.status = 'waiting';
+    table.removeEventListener('click', gHandler);
   }
 };

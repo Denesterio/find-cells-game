@@ -5,15 +5,15 @@ import { timerRender } from '../src/renderFunctions.js';
 
 export default () => {
   const state = {
+    // 'waiting' между играми
+    // 'gameStarted' во время игры
+    status: 'waiting',
     table: {
       rows: 10,
       columns: 10,
       riddled: [],
     },
-    timer: {
-      time: 180,
-      status: 'safe',
-    },
+    timer: 180,
   };
 
   // Создание и привязывание таблицы
@@ -23,11 +23,27 @@ export default () => {
   divForTable.append(tableForGame);
   const divForTimer = document.querySelector('.timer');
 
-  timerRender(state, divForTimer);
+  const stateWatcher = new Proxy(state, {
+    set(target, prop, value) {
+      switch (value) {
+        case 'gameStarted':
+          target[prop] = value;
+          clearCells(target);
+          button.setAttribute('disabled', 'true');
+          return true;
+        case 'waiting':
+          target[prop] = value;
+          button.removeAttribute('disabled');
+          return true;
+      }
+    },
+  });
+
+  timerRender(stateWatcher.timer, divForTimer);
 
   button.addEventListener('click', () => {
-    clearCells(state);
+    stateWatcher.status = 'gameStarted';
     state.table.riddled = [];
-    startGame(state, tableForGame, divForTimer, button);
+    startGame(stateWatcher, tableForGame, divForTimer);
   });
 };

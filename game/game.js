@@ -1,9 +1,9 @@
 import riddleCells from '../src/riddleCells.js';
 import startCountdown from '../src/countdown.js';
-import * as check from '../src/checks.js';
+import keepGame from './keepGame.js';
 import * as rf from '../src/renderFunctions.js';
 
-export default (mainState, table, divTimer, button) => {
+export default (mainState, table, divTimer) => {
   const state = {
     // 'game' на старте
     // 'win', 'lost' в случае победы и поражения
@@ -13,50 +13,50 @@ export default (mainState, table, divTimer, button) => {
       riddled: [],
       active: [],
     },
-    timer: {
-      time: 180,
-      // 'safe' времени больше 30 секунд
-      // 'danger', времени 30 сек. и меньше
-      // 'expired' таймер истек
-      status: 'safe',
-    },
+    timer: 180,
     texts: {
       win: 'Yeeehooo!!! You win! It was not easy, really?',
       lost: 'You are lost:( Play again?',
     },
+    lastClick: 'right',
   };
 
-  button.setAttribute('disabled', 'true');
   const cells = table.querySelectorAll('td');
   riddleCells(state, mainState, cells);
 
+  // Нужны при повторном запуске игры на том же поле
   const resultDiv = document.querySelector('.result');
   if (resultDiv) resultDiv.remove();
   table.parentElement.style.marginBottom = '50px';
+  rf.timerRender(state.timer, divTimer);
 
-  // Нужны при повторном запуске игры на том же поле
-  rf.tableRender(state, table, button);
-  rf.timerRender(state, divTimer);
+  const proxyState = new Proxy(state, {
+    set(target, prop, value) {
+      if (typeof value === 'number') {
+        target[prop] = value;
+        rf.timerRender(value, divTimer);
+        return true;
+      }
+      switch (value) {
+        case 'right':
+        case 'wrong':
+        case 'win':
+        case 'lost':
+          target[prop] = value;
+          rf.tableRender(target, value, table);
+          return true;
+      }
+    },
+  });
+
+  const gameHandler = ({ target }) => {
+    if (target.tagName !== 'TD') return;
+    keepGame(proxyState, mainState, gameHandler, countdown, target, table);
+  };
 
   const countdown = setInterval(function () {
-    startCountdown(state, countdown, rf.tableRender, table, button);
-    rf.timerRender(state, divTimer);
+    startCountdown(proxyState, mainState, countdown, gameHandler, table);
   }, 1000);
 
-  table.addEventListener('click', function func({ target }) {
-    if (target.tagName !== 'TD') return;
-    if (check.isCellRiddled(state, target)) {
-      state.table.active.push(target);
-      rf.tableRender(state, table, button);
-    } else if (state.table.active.length > 0) {
-      state.table.active = [];
-      rf.tableRender(state, table, button);
-    }
-    if (check.isWin(state)) {
-      clearInterval(countdown);
-      state.status = 'win';
-      rf.tableRender(state, table, button);
-      table.removeEventListener('click', func);
-    }
-  });
+  table.addEventListener('click', gameHandler);
 };
