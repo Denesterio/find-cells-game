@@ -1,11 +1,12 @@
 {
-  "name": "find_cells",
+  "name": "fcells",
   "version": "1.0.0",
-  "description": "game",
-  "main": "findCells.js",
+  "type": "module",
+  "description": "Simple game. Find riddled cells and open then in series",
+  "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Denesterio",
   "license": "ISC"
 }
