@@ -2,6 +2,7 @@ import riddleCells from '../src/riddleCells.js';
 import startCountdown from '../src/countdown.js';
 import keepGame from './keepGame.js';
 import * as rf from '../src/renderFunctions.js';
+import getArrDifference from '../src/arrDifference.js';
 
 export default (mainState, table, divTimer) => {
   const state = {
@@ -9,12 +10,9 @@ export default (mainState, table, divTimer) => {
     // 'win', 'lost' в случае победы и поражения
     status: 'game',
     countOfRiddledCells: 10,
-    table: {
-      riddled: [],
-      active: [],
-    },
+    tableRiddled: [],
+    tableActive: [],
     timer: 180,
-    lastClick: 'right',
   };
 
   // Нужны при повторном запуске игры на том же поле
@@ -34,14 +32,27 @@ export default (mainState, table, divTimer) => {
         rf.timerRender(value, divTimer);
         return true;
       }
+      if (prop === 'tableActive') {
+        if (value.length === 0) {
+          rf.cellsRender(value, target[prop]);
+        } else {
+          rf.cellsRender(value);
+        }
+        target[prop] = value;
+        return true;
+      }
       switch (value) {
-        case 'right':
-        case 'wrong':
         case 'win':
+          target[prop] = value;
+          rf.showResult(value, table.parentElement);
+          return true;
         case 'lost':
           target[prop] = value;
-          rf.tableRender(target, value, table);
+          const cellsNotFound = getArrDifference(target.tableRiddled, target.tableActive);
+          rf.showResult(value, table.parentElement, cellsNotFound);
           return true;
+        default:
+          throw new Error('Unknown changes in state');
       }
     },
   });
