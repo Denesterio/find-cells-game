@@ -35,6 +35,7 @@ const timerRender = (value, container) => {
   if (value <= 30) {
     paintElemInRed(container);
   } else {
+    removeRedBackground(container);
     makeElemActive(container);
   }
 };

@@ -1,6 +1,5 @@
 import generateTable from '../src/generateTable.js';
 import startGame from './game.js';
-import { timerRender } from '../src/renderFunctions.js';
 
 export default () => {
   const state = {
@@ -11,7 +10,6 @@ export default () => {
       rows: 10,
       columns: 10,
     },
-    timer: 180,
   };
 
   // Создание и привязывание таблицы
@@ -19,7 +17,6 @@ export default () => {
   const divForTable = document.querySelector('.for_table');
   const tableForGame = generateTable(state.table.rows, state.table.columns);
   divForTable.append(tableForGame);
-  const divForTimer = document.querySelector('.timer');
 
   const stateWatcher = new Proxy(state, {
     set(target, prop, value) {
@@ -38,10 +35,8 @@ export default () => {
     },
   });
 
-  timerRender(stateWatcher.timer, divForTimer);
-
   button.addEventListener('click', () => {
     stateWatcher.status = 'gameStarted';
-    startGame(stateWatcher, tableForGame, divForTimer);
+    startGame(stateWatcher);
   });
 };

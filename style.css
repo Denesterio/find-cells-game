@@ -76,7 +76,8 @@ td {
   font-weight: 700;
   border-radius: 20px;
   padding: 7px;
-  width: max-content;
+  width: 55px;
+  text-align: center;
 }
 
 .result {

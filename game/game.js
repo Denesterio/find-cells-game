@@ -3,8 +3,11 @@ import startCountdown from '../src/countdown.js';
 import keepGame from './keepGame.js';
 import * as rf from '../src/renderFunctions.js';
 import getArrDifference from '../src/arrDifference.js';
+import cacheDecorator from '../src/cacheDecorator.js';
 
-export default (mainState, table, divTimer) => {
+const cachedSelectorAll = cacheDecorator(document.querySelectorAll);
+
+export default (mainState) => {
   const state = {
     // 'game' на старте
     // 'win', 'lost' в случае победы и поражения
@@ -15,13 +18,16 @@ export default (mainState, table, divTimer) => {
     timer: 180,
   };
 
+  const divTimer = document.querySelector('.timer');
+  const table = document.querySelector('table');
+  const cells = cachedSelectorAll('td');
+
   // Нужны при повторном запуске игры на том же поле
   const resultDiv = document.querySelector('.result');
   if (resultDiv) resultDiv.remove();
   table.parentElement.style.marginBottom = '50px';
   rf.timerRender(state.timer, divTimer);
 
-  const cells = table.querySelectorAll('td');
   rf.clearCells(cells);
   riddleCells(state, cells);
 
